@@ -49,6 +49,7 @@ char *getPublicIP(int IPver) {
              sizeof(struct sockaddr_storage)) < 0) {
     // perror("sendto");
     shutdown(sockfd, SHUT_RDWR);
+    free(res);
     return NULL;
   }
 
@@ -75,7 +76,8 @@ char *getPublicIP(int IPver) {
 
   if (inet_ntop(addr.ss_family, ip, res,
                 IPver == 4 ? INET_ADDRSTRLEN : INET6_ADDRSTRLEN) == NULL) {
-    perror("inet_ntop");
+    // perror("inet_ntop");
+    free(res);
     return NULL;
   }
 
@@ -87,9 +89,11 @@ int main(int argc, char *argv[]) {
   if (argc != 2) {
     if ((ip = getPublicIP(4)) != NULL) {
       printf("%s\n", ip);
-    } else {
-      printf("No IPv4\n");
-      return 1;
+      free(ip);
+    }
+    if ((ip = getPublicIP(6)) != NULL) {
+      printf("%s\n", ip);
+      free(ip);
     }
     return 0;
   }
@@ -99,20 +103,23 @@ int main(int argc, char *argv[]) {
            "stun.cloudflare.com:3478)\n");
     printf("Usage: %s [OPTIONS]\n", argv[0]);
     printf("OPTIONS: \n");
-    printf("  -4, Get public IPv4 address\n");
-    printf("  -6, Get public IPv6 address\n");
+    printf("  -4, Only get public IPv4 address\n");
+    printf("  -6, Only get public IPv6 address\n");
     printf("  -h, --help Display help information\n");
     return 0;
   }
   if (strlen(arg) != 2 || arg[0] != '-' || (arg[1] != '4' && arg[1] != '6')) {
     printf("Invalid IP argsion argument: %s\n", arg);
     printf("Excepted: -4 (IPv4) or -6 (IPv6)\n");
+    free(ip);
     return 1;
   }
   if ((ip = getPublicIP(arg[1] - '0')) != NULL) {
     printf("%s\n", ip);
+    free(ip);
   } else {
     printf("No IPv%d\n", arg[1] - '0');
+    free(ip);
     return 1;
   }
 
