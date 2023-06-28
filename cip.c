@@ -111,10 +111,9 @@ int main(int argc, char *argv[]) {
     printf("  -h, --help Display help information\n");
     return 0;
   }
-  if (strlen(arg) != 2 || arg[0] != '-' || (arg[1] != '4' && arg[1] != '6')) {
+  if (strcmp(arg, "-4") != 0 && strcmp(arg, "-6") != 0) {
     printf("Invalid IP argsion argument: %s\n", arg);
     printf("Excepted: -4 (IPv4) or -6 (IPv6)\n");
-    free(ip);
     return 1;
   }
   if ((ip = getPublicIP(arg[1] - '0')) != NULL) {
@@ -122,7 +121,6 @@ int main(int argc, char *argv[]) {
     free(ip);
   } else {
     printf("No IPv%d\n", arg[1] - '0');
-    free(ip);
     return 1;
   }
 
