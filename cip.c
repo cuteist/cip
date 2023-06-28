@@ -87,15 +87,18 @@ char *getPublicIP(int IPver) {
 int main(int argc, char *argv[]) {
   char *ip;
   if (argc != 2) {
+    int status = 1;
     if ((ip = getPublicIP(4)) != NULL) {
       printf("%s\n", ip);
       free(ip);
+      status = 0;
     }
     if ((ip = getPublicIP(6)) != NULL) {
       printf("%s\n", ip);
       free(ip);
+      status = 0;
     }
-    return 0;
+    return status;
   }
   char *arg = argv[1];
   if (strcmp(arg, "-h") == 0 || strcmp(arg, "--help") == 0) {
